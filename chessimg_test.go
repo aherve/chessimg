@@ -2,6 +2,7 @@ package chessimg_test
 
 import (
 	"bytes"
+	"crypto/md5"
 	"io"
 	"os"
 	"strings"
@@ -20,8 +21,10 @@ func TestSVG(t *testing.T) {
 
 	// compare to expected svg
 	actualSVG := strings.TrimSpace(buf.String())
-	if expectedSVG != actualSVG {
-		t.Fatal("expected svg did not match actual svg, actual: ", actualSVG)
+	actualMD5 := md5.Sum([]byte(actualSVG))
+	expectedMD5 := md5.Sum([]byte(expectedSVG))
+	if actualMD5 != expectedMD5 {
+		t.Fatalf("expected actual md5 hash to be %x but got %x", expectedMD5, actualMD5)
 	}
 
 	// create actual svg file for visualization
