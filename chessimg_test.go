@@ -18,20 +18,20 @@ func TestSVG(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// compare to expected svg
+	actualSVG := strings.TrimSpace(buf.String())
+	if expectedSVG != actualSVG {
+		t.Fatal("expected svg did not match actual svg")
+	}
+
 	// create actual svg file for visualization
 	f, err := os.Create("actual.svg")
 	defer f.Close()
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := io.Copy(f, bytes.NewBuffer(buf.Bytes())); err != nil {
+	if _, err := io.Copy(f, bytes.NewBufferString(actualSVG)); err != nil {
 		t.Fatal(err)
-	}
-
-	// compare to expected svg
-	actualSVG := strings.TrimSpace(buf.String())
-	if expectedSVG != actualSVG {
-		t.Fatal("expected svg did not match actual svg")
 	}
 }
 
