@@ -21,7 +21,7 @@ func TestSVG(t *testing.T) {
 	// compare to expected svg
 	actualSVG := strings.TrimSpace(buf.String())
 	if expectedSVG != actualSVG {
-		t.Fatal("expected svg did not match actual svg")
+		t.Fatal("expected svg did not match actual svg, actual: ", actualSVG)
 	}
 
 	// create actual svg file for visualization
