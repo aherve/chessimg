@@ -7,15 +7,14 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/loganjspears/chess"
 	"github.com/loganjspears/chessimg"
 )
 
 func TestSVG(t *testing.T) {
 	// create buffer of actual svg
 	buf := bytes.NewBuffer([]byte{})
-	game := chess.NewGame()
-	if err := chessimg.New(buf).EncodeSVG(game.Position().Board()); err != nil {
+	fenStr := "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+	if err := chessimg.New(buf).EncodeSVG(fenStr); err != nil {
 		t.Fatal(err)
 	}
 

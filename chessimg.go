@@ -1,4 +1,4 @@
-// Package chessimg provides chess image utilities
+// Package chessimg is a go library designed to create images from board positions
 package chessimg
 
 import (
@@ -48,7 +48,13 @@ func New(w io.Writer, options ...func(*Encoder)) *Encoder {
 // EncodeSVG writes the board SVG representation into
 // the Encoder's writer.  An error is returned if there
 // is there is an error writing data.
-func (e *Encoder) EncodeSVG(board *chess.Board) error {
+func (e *Encoder) EncodeSVG(fenStr string) error {
+	fen, err := chess.FEN(fenStr)
+	if err != nil {
+		return err
+	}
+	g := chess.NewGame(fen)
+	board := g.Position().Board()
 	sqSize := 45
 	canvas := svg.New(e.w)
 	width := 8 * sqSize
