@@ -10,7 +10,6 @@ import (
 	"github.com/ajstarks/svgo"
 	"github.com/loganjspears/chess"
 	"github.com/loganjspears/chessimg/internal"
-	"github.com/lucasb-eyer/go-colorful"
 )
 
 // A Encoder encodes chess boards into images.
@@ -98,17 +97,14 @@ func (e *Encoder) EncodeSVG(fenStr string) error {
 			}
 		}
 	}
+
 	canvas.End()
 	return nil
 }
 
 func colorToHex(c color.Color) string {
 	r, g, b, _ := c.RGBA()
-	return colorful.Color{
-		R: float64(r) / 255.0,
-		G: float64(g) / 255.0,
-		B: float64(b) / 255.0,
-	}.Hex()
+	return fmt.Sprintf("#%02x%02x%02x", uint8(float64(r)+0.5), uint8(float64(g)*1.0+0.5), uint8(float64(b)*1.0+0.5))
 }
 
 func pieceXML(x, y int, p chess.Piece) string {
