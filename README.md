@@ -21,5 +21,5 @@ if err := chessimg.New(f, mark).EncodeSVG(fenStr); err != nil {
 
 ### Resulting Image
 
-![rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq - 0 1](/example.png "Example.svg")
+![rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq - 0 1](/example.png)
  
