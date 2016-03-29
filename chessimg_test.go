@@ -35,7 +35,7 @@ func TestSVG(t *testing.T) {
 	}
 
 	// create actual svg file for visualization
-	f, err := os.Create("actual.svg")
+	f, err := os.Create("example.svg")
 	defer f.Close()
 	if err != nil {
 		t.Error(err)
