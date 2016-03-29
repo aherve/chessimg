@@ -17,7 +17,6 @@ mark := chessimg.MarkSquares(color.RGBA{255, 255, 0, 1}, chess.D2, chess.D4)
 if err := chessimg.New(f, mark).EncodeSVG(fenStr); err != nil {
 	log.Fatal(err)
 }
-// take a look at actual.svg in the repo to view the result
 ```
 
 ### Resulting Image
