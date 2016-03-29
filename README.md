@@ -7,11 +7,12 @@
 ### Code Example
 
 ```go
-// populate buffer w/ SVG of the starting position
+// create file
 f, err := os.Create("example.svg")
 if err != nil {
     log.Fatal(err)
 }
+// write image of position and marked squares to file
 fenStr := "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq - 0 1"
 mark := chessimg.MarkSquares(color.RGBA{255, 255, 0, 1}, chess.D2, chess.D4)
 if err := chessimg.New(f, mark).EncodeSVG(fenStr); err != nil {
