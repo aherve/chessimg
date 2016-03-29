@@ -17,6 +17,7 @@ type Encoder struct {
 	w     io.Writer
 	light color.Color
 	dark  color.Color
+	marks map[chess.Square]color.Color
 }
 
 // SquareColors is designed to be used as an optional argument
@@ -29,6 +30,18 @@ func SquareColors(light, dark color.Color) func(*Encoder) {
 	}
 }
 
+// MarkSquares is designed to be used as an optional argument
+// to the New function.  It marks the given squares with the
+// color.  A possible useage includes marking squares of the
+// previous move.
+func MarkSquares(c color.Color, sqs ...chess.Square) func(*Encoder) {
+	return func(e *Encoder) {
+		for _, sq := range sqs {
+			e.marks[sq] = c
+		}
+	}
+}
+
 // New returns an encoder that writes to the given writer.
 // New also takes options which can customize the image
 // output.
@@ -37,6 +50,7 @@ func New(w io.Writer, options ...func(*Encoder)) *Encoder {
 		w:     w,
 		light: color.RGBA{235, 209, 166, 1},
 		dark:  color.RGBA{165, 117, 81, 1},
+		marks: map[chess.Square]color.Color{},
 	}
 	for _, op := range options {
 		op(e)
@@ -76,6 +90,10 @@ func (e *Encoder) EncodeSVG(fenStr string) error {
 		// draw square
 		c := e.colorForSquare(sq)
 		canvas.Rect(x, y, sqWidth, sqHeight, "fill: "+colorToHex(c))
+		markColor, ok := e.marks[sq]
+		if ok {
+			canvas.Rect(x, y, sqWidth, sqHeight, "fill-opacity:0.2;fill: "+colorToHex(markColor))
+		}
 		// draw piece
 		p := boardMap[sq]
 		if p != chess.NoPiece {
