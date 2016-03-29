@@ -44,6 +44,18 @@ func New(w io.Writer, options ...func(*Encoder)) *Encoder {
 	return e
 }
 
+const (
+	sqWidth     = 45
+	sqHeight    = 45
+	boardWidth  = 8 * sqWidth
+	boardHeight = 8 * sqHeight
+)
+
+var (
+	orderOfRanks = []chess.Rank{chess.Rank8, chess.Rank7, chess.Rank6, chess.Rank5, chess.Rank4, chess.Rank3, chess.Rank2, chess.Rank1}
+	orderOfFiles = []chess.File{chess.FileA, chess.FileB, chess.FileC, chess.FileD, chess.FileE, chess.FileF, chess.FileG, chess.FileH}
+)
+
 // EncodeSVG writes the board SVG representation into
 // the Encoder's writer.  An error is returned if there
 // is there is an error writing data.
@@ -53,53 +65,61 @@ func (e *Encoder) EncodeSVG(fenStr string) error {
 		return err
 	}
 	g := chess.NewGame(fen)
-	board := g.Position().Board()
-	sqSize := 45
+	boardMap := g.Position().Board().SquareMap()
 	canvas := svg.New(e.w)
-	width := 8 * sqSize
-	height := 8 * sqSize
-	ranks := []string{"8", "7", "6", "5", "4", "3", "2", "1"}
-	files := []string{"a", "b", "c", "d", "e", "f", "g", "h"}
+	canvas.Start(boardWidth, boardHeight)
+	canvas.Rect(0, 0, boardWidth, boardHeight)
 
-	lightHex := colorToHex(e.light)
-	darkHex := colorToHex(e.dark)
-
-	canvas.Start(width, height)
-	canvas.Rect(0, 0, width, height)
-	for file := 1; file <= 8; file++ {
-		for rank := 1; rank <= 8; rank++ {
-			sqHex := lightHex
-			txtHex := darkHex
-			if ((file + rank) % 2) == 0 {
-				sqHex = darkHex
-				txtHex = lightHex
-			}
-			x1 := sqSize * (file - 1)
-			y1 := sqSize * (rank - 1)
-			canvas.Rect(x1, y1, sqSize, sqSize, "fill: "+sqHex)
-			for sq, p := range board.SquareMap() {
-				hasFile := int(sq.File()) == file-1
-				hasRank := int(sq.Rank()) == 8-rank
-				if hasFile && hasRank && p != chess.NoPiece {
-					xml := pieceXML(x1, y1, p)
-					if _, err := io.WriteString(canvas.Writer, xml); err != nil {
-						return err
-					}
-				}
-			}
-			if file == 1 {
-				style := "font-size:11px;fill: " + txtHex
-				canvas.Text(x1+(sqSize*1/20), y1+(sqSize*5/20), ranks[rank-1], style)
-			}
-			if rank == 8 {
-				style := "text-anchor:end;font-size:11px;fill: " + txtHex
-				canvas.Text(x1+(sqSize*19/20), y1+sqSize-(sqSize*1/15), files[file-1], style)
+	for i := 0; i < 64; i++ {
+		sq := chess.Square(i)
+		x, y := xyForSquare(sq)
+		// draw square
+		c := e.colorForSquare(sq)
+		canvas.Rect(x, y, sqWidth, sqHeight, "fill: "+colorToHex(c))
+		// draw piece
+		p := boardMap[sq]
+		if p != chess.NoPiece {
+			xml := pieceXML(x, y, p)
+			if _, err := io.WriteString(canvas.Writer, xml); err != nil {
+				return err
 			}
 		}
+		// draw rank text on file A
+		txtColor := e.colorForText(sq)
+		if sq.File() == chess.FileA {
+			style := "font-size:11px;fill: " + colorToHex(txtColor)
+			canvas.Text(x+(sqWidth*1/20), y+(sqHeight*5/20), sq.Rank().String(), style)
+		}
+		// draw file text on rank 1
+		if sq.Rank() == chess.Rank1 {
+			style := "text-anchor:end;font-size:11px;fill: " + colorToHex(txtColor)
+			canvas.Text(x+(sqWidth*19/20), y+sqHeight-(sqHeight*1/15), sq.File().String(), style)
+		}
 	}
-
 	canvas.End()
 	return nil
+}
+
+func (e *Encoder) colorForSquare(sq chess.Square) color.Color {
+	sqSum := int(sq.File()) + int(sq.Rank())
+	if sqSum%2 == 0 {
+		return e.dark
+	}
+	return e.light
+}
+
+func (e *Encoder) colorForText(sq chess.Square) color.Color {
+	sqSum := int(sq.File()) + int(sq.Rank())
+	if sqSum%2 == 0 {
+		return e.light
+	}
+	return e.dark
+}
+
+func xyForSquare(sq chess.Square) (x, y int) {
+	fileIndex := int(sq.File())
+	rankIndex := 7 - int(sq.Rank())
+	return fileIndex * sqWidth, rankIndex * sqHeight
 }
 
 func colorToHex(c color.Color) string {
