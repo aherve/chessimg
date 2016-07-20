@@ -1,5 +1,5 @@
 {
-	"ImportPath": "github.com/loganjspears/chessimg",
+	"ImportPath": "github.com/notnil/chessimg",
 	"GoVersion": "go1.6",
 	"GodepVersion": "v60",
 	"Deps": [
@@ -9,8 +9,8 @@
 			"Rev": "99831a8cf95786bcee3956cbf3f181c91bc37c24"
 		},
 		{
-			"ImportPath": "github.com/loganjspears/chess",
-			"Rev": "e04458b4431ed094c8e694f4a3ac16217aeb1f80"
+			"ImportPath": "github.com/notnil/chess",
+			"Rev": "7fe6d0a80f260e118e8fda8fa29cb507f8446947"
 		}
 	]
 }

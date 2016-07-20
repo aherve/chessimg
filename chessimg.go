@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/ajstarks/svgo"
-	"github.com/loganjspears/chess"
-	"github.com/loganjspears/chessimg/internal"
+	"github.com/notnil/chess"
+	"github.com/notnil/chessimg/internal"
 )
 
 // A Encoder encodes chess boards into images.

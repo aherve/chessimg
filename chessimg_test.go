@@ -10,8 +10,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/loganjspears/chess"
-	"github.com/loganjspears/chessimg"
+	"github.com/notnil/chess"
+	"github.com/notnil/chessimg"
 )
 
 const (
