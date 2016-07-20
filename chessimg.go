@@ -32,7 +32,7 @@ func SquareColors(light, dark color.Color) func(*Encoder) {
 
 // MarkSquares is designed to be used as an optional argument
 // to the New function.  It marks the given squares with the
-// color.  A possible useage includes marking squares of the
+// color.  A possible usage includes marking squares of the
 // previous move.
 func MarkSquares(c color.Color, sqs ...chess.Square) func(*Encoder) {
 	return func(e *Encoder) {
