@@ -17,7 +17,15 @@ import (
 // SVG also takes options which can customize the image output.
 func SVG(w io.Writer, b *chess.Board, opts ...func(*encoder)) error {
 	e := new(w, opts)
-	return e.EncodeSVG(b)
+	return e.EncodeSVG(b, false)
+}
+
+// ReversedSVG writes the *flipped* board SVG representation into the writer.
+// An error is returned if there is there is an error writing data.
+// SVG also takes options which can customize the image output.
+func ReversedSVG(w io.Writer, b *chess.Board, opts ...func(*encoder)) error {
+	e := new(w, opts)
+	return e.EncodeSVG(b, true)
 }
 
 // SquareColors is designed to be used as an optional argument
@@ -81,7 +89,7 @@ var (
 // EncodeSVG writes the board SVG representation into
 // the Encoder's writer.  An error is returned if there
 // is there is an error writing data.
-func (e *encoder) EncodeSVG(b *chess.Board) error {
+func (e *encoder) EncodeSVG(b *chess.Board, reversed bool) error {
 	boardMap := b.SquareMap()
 	canvas := svg.New(e.w)
 	canvas.Start(boardWidth, boardHeight)
@@ -89,7 +97,7 @@ func (e *encoder) EncodeSVG(b *chess.Board) error {
 
 	for i := 0; i < 64; i++ {
 		sq := chess.Square(i)
-		x, y := xyForSquare(sq)
+		x, y := xyForSquare(sq, reversed)
 		// draw square
 		c := e.colorForSquare(sq)
 		canvas.Rect(x, y, sqWidth, sqHeight, "fill: "+colorToHex(c))
@@ -105,14 +113,14 @@ func (e *encoder) EncodeSVG(b *chess.Board) error {
 				return err
 			}
 		}
-		// draw rank text on file A
+		// draw rank text on file A or H
 		txtColor := e.colorForText(sq)
-		if sq.File() == chess.FileA {
+		if !reversed && sq.File() == chess.FileA || reversed && sq.File() == chess.FileH {
 			style := "font-size:11px;fill: " + colorToHex(txtColor)
 			canvas.Text(x+(sqWidth*1/20), y+(sqHeight*5/20), sq.Rank().String(), style)
 		}
-		// draw file text on rank 1
-		if sq.Rank() == chess.Rank1 {
+		// draw file text on rank 1 or 8
+		if !reversed && sq.Rank() == chess.Rank1 || reversed && sq.Rank() == chess.Rank8 {
 			style := "text-anchor:end;font-size:11px;fill: " + colorToHex(txtColor)
 			canvas.Text(x+(sqWidth*19/20), y+sqHeight-(sqHeight*1/15), sq.File().String(), style)
 		}
@@ -137,9 +145,15 @@ func (e *encoder) colorForText(sq chess.Square) color.Color {
 	return e.dark
 }
 
-func xyForSquare(sq chess.Square) (x, y int) {
-	fileIndex := int(sq.File())
-	rankIndex := 7 - int(sq.Rank())
+func xyForSquare(sq chess.Square, reversed bool) (x, y int) {
+	var fileIndex, rankIndex int
+	if reversed {
+		fileIndex = int(7 - sq.File())
+		rankIndex = int(sq.Rank())
+	} else {
+		fileIndex = int(sq.File())
+		rankIndex = int(7 - sq.Rank())
+	}
 	return fileIndex * sqWidth, rankIndex * sqHeight
 }
 
